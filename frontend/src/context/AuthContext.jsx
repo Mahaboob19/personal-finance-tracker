@@ -5,10 +5,29 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("pft_user");
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem("pft_user");
+      if (!savedUser || savedUser === "undefined" || savedUser === "null") {
+        return null;
+      }
+      return JSON.parse(savedUser);
+    } catch {
+      localStorage.removeItem("pft_user");
+      return null;
+    }
   });
-  const [token, setToken] = useState(() => localStorage.getItem("pft_token") || null);
+  const [token, setToken] = useState(() => {
+    try {
+      const savedToken = localStorage.getItem("pft_token");
+      if (!savedToken || savedToken === "undefined" || savedToken === "null") {
+        return null;
+      }
+      return savedToken;
+    } catch {
+      localStorage.removeItem("pft_token");
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   // Validate session against server on startup
