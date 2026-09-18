@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TransactionForm from "../components/transactions/TransactionForm.jsx";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   getTransactionById,
   createTransaction,
@@ -11,6 +12,7 @@ import {
 const TransactionFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const isEditMode = Boolean(id);
 
   const [initialData, setInitialData] = useState(null);
@@ -42,8 +44,10 @@ const TransactionFormPage = () => {
     try {
       if (isEditMode) {
         await updateTransaction(id, formData);
+        showToast("Transaction updated successfully!");
       } else {
         await createTransaction(formData);
+        showToast("Transaction created successfully!");
       }
       navigate("/transactions");
     } finally {

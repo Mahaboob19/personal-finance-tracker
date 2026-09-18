@@ -3,6 +3,7 @@ import BudgetCard from "../components/budgets/BudgetCard.jsx";
 import BudgetSummary from "../components/budgets/BudgetSummary.jsx";
 import BudgetModal from "../components/budgets/BudgetModal.jsx";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import { getMonthName } from "../utils/formatters.js";
 import {
   getBudgets,
@@ -12,6 +13,7 @@ import {
 } from "../services/budgetService.js";
 
 const BudgetsPage = () => {
+  const { showToast } = useToast();
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
@@ -50,8 +52,10 @@ const BudgetsPage = () => {
   const handleCreateOrUpdate = async (formData) => {
     if (editingBudget) {
       await updateBudget(editingBudget._id, { amount: formData.amount });
+      showToast("Budget limit updated successfully!");
     } else {
       await createBudget(formData);
+      showToast("New category budget established!");
     }
     fetchBudgets();
   };
@@ -63,8 +67,9 @@ const BudgetsPage = () => {
       await deleteBudget(deleteTargetId);
       setBudgets((prev) => prev.filter((b) => b._id !== deleteTargetId));
       setDeleteTargetId(null);
+      showToast("Budget deleted successfully!");
     } catch (err) {
-      alert(err?.response?.data?.message || "Failed to delete budget.");
+      showToast(err?.response?.data?.message || "Failed to delete budget.", "error");
     } finally {
       setIsDeleting(false);
     }

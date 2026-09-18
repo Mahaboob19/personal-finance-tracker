@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import TransactionsPage from "./pages/TransactionsPage.jsx";
 import TransactionFormPage from "./pages/TransactionFormPage.jsx";
 import BudgetsPage from "./pages/BudgetsPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 function App() {
@@ -34,7 +35,7 @@ function App() {
           <Route path="/transactions/add" element={<TransactionFormPage />} />
           <Route path="/transactions/edit/:id" element={<TransactionFormPage />} />
           <Route path="/budgets" element={<BudgetsPage />} />
-          {/* Additional pages will be added in subsequent phases */}
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
 

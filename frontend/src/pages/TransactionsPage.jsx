@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import TransactionList from "../components/transactions/TransactionList.jsx";
 import TransactionFilters from "../components/transactions/TransactionFilters.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   getTransactions,
   deleteTransaction,
 } from "../services/transactionService.js";
 
 const TransactionsPage = () => {
+  const { showToast } = useToast();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -74,9 +76,11 @@ const TransactionsPage = () => {
       await deleteTransaction(deleteTargetId);
       setTransactions((prev) => prev.filter((t) => t._id !== deleteTargetId));
       setDeleteTargetId(null);
+      showToast("Transaction deleted successfully!");
     } catch (err) {
-      alert(
-        err?.response?.data?.message || "Failed to delete transaction."
+      showToast(
+        err?.response?.data?.message || "Failed to delete transaction.",
+        "error"
       );
     } finally {
       setIsDeleting(false);
