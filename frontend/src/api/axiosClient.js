@@ -1,7 +1,10 @@
 import axios from "axios";
 
 // Automatically adapts to local proxy or production URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+const rawBase = import.meta.env.VITE_API_URL;
+const API_BASE_URL = rawBase
+  ? `${rawBase.replace(/\/+$/, "")}/api`
+  : "/api";
 
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
