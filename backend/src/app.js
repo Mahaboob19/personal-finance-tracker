@@ -87,13 +87,16 @@ if (process.env.NODE_ENV === "production" && existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
 
   // SPA fallback — all non-API routes return index.html so React Router works
-  app.get("*", (req, res) => {
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
     res.sendFile(join(frontendDist, "index.html"));
   });
-} else {
-  // Development: 404 handler for undefined routes
-  app.use(notFound);
 }
+
+// Catch-all 404 handler for undefined API routes or development requests
+app.use(notFound);
 
 // Centralized error handling middleware (always last)
 app.use(errorHandler);
