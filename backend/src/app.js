@@ -1,9 +1,6 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import { existsSync } from "fs";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
@@ -13,26 +10,16 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
 const app = express();
 
-// Resolve __dirname for ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Path to the built React frontend (frontend/dist)
-// __dirname = backend/src/  →  ../../frontend/dist = frontend/dist
-const frontendDist = join(__dirname, "..", "..", "frontend", "dist");
-
-// Configure CORS — only needed for local development (in production, same-origin)
+// Configure CORS for local development
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  process.env.CLIENT_URL,
-].filter(Boolean);
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (curl, Postman) or in development
-      if (!origin || process.env.NODE_ENV !== "production" || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS policy"));
@@ -46,7 +33,7 @@ app.use(
 app.use(express.json());
 
 // Root API welcome endpoint
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "FinanceFlow REST API is running",
@@ -81,24 +68,10 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// --- Production: Serve built React SPA from frontend/dist ---
-if (process.env.NODE_ENV === "production" && existsSync(frontendDist)) {
-  // Serve static assets (JS, CSS, images, etc.)
-  app.use(express.static(frontendDist));
-
-  // SPA fallback — all non-API routes return index.html so React Router works
-  app.use((req, res, next) => {
-    if (req.path.startsWith("/api/")) {
-      return next();
-    }
-    res.sendFile(join(frontendDist, "index.html"));
-  });
-}
-
-// Catch-all 404 handler for undefined API routes or development requests
+// Catch-all 404 handler for undefined routes
 app.use(notFound);
 
-// Centralized error handling middleware (always last)
+// Centralized error handling middleware
 app.use(errorHandler);
 
 export default app;
