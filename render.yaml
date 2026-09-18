@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: financeflow-api
-    runtime: node
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: node src/server.js
+    name: financeflow
+    env: node
+    # Build both frontend and backend from the repo root
+    buildCommand: cd frontend && npm install && npm run build && cd ../backend && npm install
+    startCommand: node backend/src/server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -12,8 +12,6 @@ services:
       - key: PORT
         value: 5000
       - key: MONGO_URI
-        sync: false   # Set manually in Render dashboard
+        sync: false          # You MUST set this manually in the Render dashboard
       - key: JWT_SECRET
-        generateValue: true   # Render auto-generates a secure 256-bit secret
-      - key: CLIENT_URL
-        value: https://financeflow-six-gilt.vercel.app
+        generateValue: true  # Render auto-generates a secure random secret
