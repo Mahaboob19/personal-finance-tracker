@@ -34,8 +34,22 @@ const DashboardPage = () => {
       ]);
 
       setSummary(summaryRes);
-      setMonthlyData(monthlyRes);
-      setCategoryData(categoryRes);
+
+      // Handle both raw array or { monthlyData: [...] } payload structure
+      const rawMonths = monthlyRes?.monthlyData || (Array.isArray(monthlyRes) ? monthlyRes : []);
+      const formattedMonths = rawMonths.map((m) => ({
+        ...m,
+        monthName: m.monthName || m.month,
+      }));
+      setMonthlyData(formattedMonths);
+
+      // Handle both raw array or { categories: [...] } payload structure
+      const rawCategories = categoryRes?.categories || (Array.isArray(categoryRes) ? categoryRes : []);
+      const formattedCategories = rawCategories.map((c) => ({
+        ...c,
+        total: c.total !== undefined ? c.total : c.amount || 0,
+      }));
+      setCategoryData(formattedCategories);
     } catch (err) {
       setError(
         err?.response?.data?.message || "Failed to load dashboard insights."
