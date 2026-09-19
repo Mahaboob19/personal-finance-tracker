@@ -14,22 +14,24 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 const app = express();
 
 /* =========================================================
-   CORS CONFIGURATION
+   CORS
    ========================================================= */
+
+const frontendUrl = process.env.CLIENT_URL?.replace(/\/$/, "");
 
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  process.env.CLIENT_URL,
+  frontendUrl,
 ].filter(Boolean);
 
+console.log("CLIENT_URL:", frontendUrl);
 console.log("Allowed CORS origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header.
-      // Useful for Postman, curl, server-to-server requests, etc.
+      // Allow Postman, curl, server-to-server requests
       if (!origin) {
         return callback(null, true);
       }
@@ -39,17 +41,26 @@ app.use(
         return callback(null, true);
       }
 
-      // During development, allow all origins
+      // Allow all origins during local development
       if (process.env.NODE_ENV !== "production") {
         return callback(null, true);
       }
+
+      console.error("CORS blocked origin:", origin);
 
       return callback(new Error("Not allowed by CORS policy"));
     },
 
     credentials: true,
 
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
 
     allowedHeaders: [
       "Content-Type",
@@ -59,13 +70,13 @@ app.use(
 );
 
 /* =========================================================
-   BODY PARSING
+   BODY PARSER
    ========================================================= */
 
 app.use(express.json());
 
 /* =========================================================
-   ROOT API
+   ROOT
    ========================================================= */
 
 app.get("/", (req, res) => {
@@ -114,13 +125,13 @@ app.use("/api/budgets", budgetRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 /* =========================================================
-   404 HANDLER
+   404
    ========================================================= */
 
 app.use(notFound);
 
 /* =========================================================
-   GLOBAL ERROR HANDLER
+   ERROR HANDLER
    ========================================================= */
 
 app.use(errorHandler);
