@@ -10,7 +10,7 @@ import Transaction from "../src/models/Transaction.js";
 
 dotenv.config();
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/PFT";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/FinFlow";
 const PORT = 5093;
 
 let server;

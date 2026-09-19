@@ -8,7 +8,7 @@ import User from "../src/models/User.js";
 
 dotenv.config();
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/PFT";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/FinFlow";
 const PORT = 5091;
 
 let server;
